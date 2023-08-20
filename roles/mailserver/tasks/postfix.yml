@@ -1,0 +1,69 @@
+- name: install postfix and related packages
+  apt: pkg={{ item }} state=present
+  with_items:
+    - libsasl2-modules
+    - postfix
+    - postfix-pcre
+    - postfix-pgsql
+    - postgrey
+    - sasl2-bin
+    - postfix-policyd-spf-python
+  tags:
+    - dependencies
+
+- name: create postfix directories
+  file:
+    path: "{{ item.dir }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "0770"
+  with_items:
+    - { dir: "/etc/postfix/maps" }
+
+- name: copy postfix configuration
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  with_items:
+    - { src: etc_postfix_maps_smtp_header_checks.pcre.j2, dest: /etc/postfix/maps/smtp_header_checks.pcre }
+    - { src: etc_postfix_import-virtual.sql.j2, dest: /etc/postfix/import-virtual.sql }
+    - { src: etc_postfix_main.cf.j2, dest: /etc/postfix/main.cf }
+    - { src: etc_postfix_sasl_passwd.j2, dest: /etc/postfix/sasl_passwd, mode: "0600" }
+    - { src: etc_postfix_master.cf.j2, dest: /etc/postfix/master.cf }
+    - { src: etc_postfix_pgsql-virtual-alias-maps.cf.j2, dest: /etc/postfix/pgsql-virtual-alias-maps.cf }
+    - { src: etc_postfix_pgsql-virtual-mailbox-domains.cf.j2, dest: /etc/postfix/pgsql-virtual-mailbox-domains.cf }
+    - { src: etc_postfix_pgsql-virtual-mailbox-maps.cf.j2, dest: /etc/postfix/pgsql-virtual-mailbox-maps.cf }
+    - { src: etc_postfix_ldap-virtual-alias-maps.cf.j2, dest: /etc/postfix/ldap-virtual-alias-maps.cf }
+    - { src: etc_postfix_ldap-virtual-mailbox-domains.cf.j2, dest: /etc/postfix/ldap-virtual-mailbox-domains.cf }
+    - { src: etc_postfix_ldap-virtual-mailbox-maps.cf.j2, dest: /etc/postfix/ldap-virtual-mailbox-maps.cf }
+  notify: restart postfix
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Process import-virtual.sql
+  command: >-
+    psql -h {{ mail_db_host }} -d {{ mail_db_name }} -U {{ mail_db_user }}
+    -f /etc/postfix/import-virtual.sql --set ON_ERROR_STOP=1
+  environment:
+    PGPASSWORD: "{{ mail_db_password }}"
+  when: postfix_auth_provider == "pgsql"
+  notify: restart postfix
+  ignore_errors: "{{ ansible_check_mode }}"
+
+# - name: Process ??? for OpenLDAP
+#   command: >-
+#
+#   when: postfix_auth_provider == "ldap"
+#   notify: restart postfix
+#   ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Process sasl_passwd
+  shell: |
+    postmap /etc/postfix/sasl_passwd
+  when: mail_smtp_relay_sasl_credentials is defined and mail_smtp_relay_sasl_credentials|length and mail_smtp_relay_host_name is defined and mail_smtp_relay_host_name|length
+  notify: restart postfix
+
+  ignore_errors: "{{ ansible_check_mode }}"

@@ -97,7 +97,7 @@ disable_plaintext_auth={{ 'yes' if dovecot_disable_plaintext_auth else 'no' }}
 #   plain login digest-md5 cram-md5 ntlm rpa apop anonymous gssapi otp
 #   gss-spnego
 # NOTE: See also disable_plaintext_auth setting.
-auth_mechanisms = plain
+auth_mechanisms = plain login
 
 ##
 ## Password and user databases
@@ -120,8 +120,12 @@ auth_mechanisms = plain
 #!include auth-master.conf.ext
 
 #!include auth-system.conf.ext
-#!include auth-sql.conf.ext
+{% if dovecot_auth_provider == "pgsql" %}
+!include auth-sql.conf.ext
+{% endif %}
+{% if dovecot_auth_provider == "ldap" %}
 !include auth-ldap.conf.ext
+{% endif %}
 #!include auth-passwdfile.conf.ext
 #!include auth-checkpassword.conf.ext
 #!include auth-static.conf.ext

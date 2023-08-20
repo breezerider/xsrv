@@ -1,0 +1,50 @@
+##### MAILSERVER DATABASE (postgresql) #####
+
+- name: install packages for postgresql support
+  apt:
+    state: present
+    package:
+      - python3-psycopg2
+      - acl # required to use 'become' unprivilegied user
+
+- name: create mail server postgresql user
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "{{ mail_db_user }}"
+    state: present
+    no_password_changes: yes
+  when: postfix_auth_provider == "pgsql"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: set mail server postgresql user password
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "{{ mail_db_user }}"
+    password: "{{ mail_db_password }}"
+  when: mail_db_password is defined and postfix_auth_provider == "pgsql"
+  no_log: True
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: create mail server postgresql database
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ mail_db_name }}"
+    state: present
+    encoding: 'UNICODE'
+    owner: '{{ mail_db_user }}'
+  when: postfix_auth_provider == "pgsql"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: grant privileges on mail server database to mail server postgresql user
+  become: yes
+  become_user: postgres
+  postgresql_privs:
+    db: "{{ mail_db_name }}"
+    privs: ALL
+    type: database
+    role: "{{ mail_db_user }}"
+  when: postfix_auth_provider == "pgsql"
+  ignore_errors: "{{ ansible_check_mode }}"

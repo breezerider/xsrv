@@ -2,6 +2,8 @@
   import_tasks: checks.yml
   tags:
     - dovecot
+    - postfix
+    - opendkim
     - mail
     - checks
 
@@ -10,11 +12,43 @@
   become: yes
   tags:
     - dovecot
+    - postfix
+    - opendkim
     - mail
     - ssl
 
+- name: import postgresql configuration tasks
+  import_tasks: postgresql.yml
+  become: yes
+  tags:
+    - dovecot
+    - postfix
+    - mail
+  when: dovecot_auth_provider == 'pgsql' or postfix_auth_provider == 'pgsql'
+
+- name: import postfix configuration tasks
+  import_tasks: postfix.yml
+  become: yes
+  tags:
+    - postfix
+    - mail
+
+- name: import opendkim configuration tasks
+  import_tasks: opendkim.yml
+  become: yes
+  tags:
+    - opendkim
+    - mail
+
 - name: import dovecot configuration tasks
   import_tasks: dovecot.yml
+  become: yes
+  tags:
+    - dovecot
+    - mail
+
+- name: import users configuration tasks
+  import_tasks: users.yml
   become: yes
   tags:
     - dovecot
@@ -36,6 +70,7 @@
   become: yes
   tags:
     - dovecot
+    - postfix
     - mail
     - firewall
   when:
@@ -47,6 +82,7 @@
   become: yes
   tags:
     - dovecot
+    - postfix
     - mail
     - backup
   when:
@@ -56,8 +92,14 @@
 - name: import ansible facts configuration tasks
   import_tasks: fact.yml
   become: yes
-  tags: dovecot
+  tags:
+    - dovecot
+    - postfix
+    - opendkim
 
 - name: apply configuration (flush handlers)
   meta: flush_handlers
-  tags: dovecot
+  tags:
+    - dovecot
+    - postfix
+    - opendkim

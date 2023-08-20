@@ -46,6 +46,21 @@ dnsmasq_upstream_servers:
   - 1.0.0.1
 
 ##### COMMON - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/common/defaults/main.yml
+# timezone: "Etc/UTC"
+
+# firewalld_zone_sources:
+#   - zone: internal # add all RFC1918 addresses to the internal zone
+#     sources:
+#       - 192.168.0.0/16
+#       - 172.16.0.0/12
+#       - 10.0.0.0/8
+
+# fail2ban_ignoreip:
+#   - '10.0.0.0/8'
+#   - '192.168.0.0/16'
+#   - '172.16.0.0/12'
+
+# linux_users: []
 
 ##### NETDATA - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/monitoring_netdata/defaults/main.yml
 
@@ -53,7 +68,20 @@ dnsmasq_upstream_servers:
 
 ##### LIBVIRT - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/samba/defaults/libvirt.yml
 
-##### DOVECOT - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mail_dovecot/defaults/main.yml
+##### MAILSERVER - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
+mailserver_fqdn: "mail.CHANGEME.org"
+mailserver_autoconfig_fqdn: "autoconfig.CHANGEME.org"
+mailserver_virtual_domains: []
+mailserver_virtual_users: []
+mailserver_virtual_aliases: []
+
+##### POSTFIX - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
+postfix_fqdn: "imap.CHANGEME.org"
+postfix_ldap_uri: "ldap://ldap.CHANGEME.org"
+postfix_ldap_base: "ou=users,dc=CHANGEME,dc=org"
+postfix_ldap_bind_dn: "cn=bind,ou=system,dc=CHANGEME,dc=org"
+
+##### DOVECOT - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
 dovecot_fqdn: "imap.CHANGEME.org"
 dovecot_ldap_uri: "ldap://ldap.CHANGEME.org"
 dovecot_ldap_base: "ou=users,dc=CHANGEME,dc=org"

@@ -1,0 +1,21 @@
+- name: setup firewalld rules for dovecot
+  ansible.posix.firewalld:
+    zone: "{{ item[1].zone }}"
+    service: "{{ item[0] }}"
+    state: "{{ item[1].state }}"
+    permanent: yes
+    immediate: yes
+  with_nested:
+    - ['imaps', 'imap']
+    - "{{ dovecot_firewalld_zones }}"
+
+- name: setup firewalld rules for postfix
+  ansible.posix.firewalld:
+    zone: "{{ item[1].zone }}"
+    service: "{{ item[0] }}"
+    state: "{{ item[1].state }}"
+    permanent: yes
+    immediate: yes
+  with_nested:
+    - ['smtp', 'smtps', 'smtp-submission']
+    - "{{ postfix_firewalld_zones }}"

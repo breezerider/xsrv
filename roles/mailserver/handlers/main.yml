@@ -1,0 +1,24 @@
+- name: restart dovecot
+  become: yes
+  service:
+    name: dovecot
+    state: restarted
+  when: dovecot_enable_service | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: restart postfix
+  become: yes
+  service:
+    name: postfix
+    state: restarted
+  when: postfix_enable_service | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: restart opendkim
+  become: yes
+  service:
+    name: opendkim
+    state: restarted
+  when: opendkim_enable_service | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+

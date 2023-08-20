@@ -1,0 +1,8 @@
+server_host = {{ postfix_ldap_uri }}
+
+bind = yes
+bind_dn = {{ postfix_ldap_bind_dn }}
+bind_pw = {{ postfix_ldap_bind_password }}
+
+search_base = {{ postfix_ldap_base }}
+scope = sub

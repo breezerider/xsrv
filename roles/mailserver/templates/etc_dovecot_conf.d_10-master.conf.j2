@@ -12,7 +12,7 @@
 
 # Internal user is used by unprivileged processes. It should be separate from
 # login user, so that login processes can't disturb other processes.
-#default_internal_user = dovecot
+default_internal_user = mail
 
 service imap-login {
 {% if dovecot_listen_imap %}
@@ -47,24 +47,28 @@ service imap-login {
 #   }
 # }
 
-# service submission-login {
-#   inet_listener submission {
-#     #port = 587
-#   }
-# }
+service submission-login {
+  #inet_listener submission {
+    #port = 587
+  #}
+}
 
-# service lmtp {
-#   unix_listener lmtp {
-#     #mode = 0666
-#   }
+service lmtp {
+  unix_listener /var/spool/postfix/private/dovecot-lmtp {
+    mode = 0666
+    group = postfix
+    user = postfix
+  }
 
-#   # Create inet listener only if you can't use the above UNIX socket
-#   #inet_listener lmtp {
-#     # Avoid making LMTP visible for the entire internet
-#     #address =
-#     #port = 
-#   #}
-# }
+  # Create inet listener only if you can't use the above UNIX socket
+  #inet_listener lmtp {
+    # Avoid making LMTP visible for the entire internet
+    #address =
+    #port =
+  #}
+
+  user = mail
+}
 
 service imap {
   # Most of the memory goes to mmap()ing files. You may need to increase this
@@ -80,10 +84,10 @@ service imap {
 #   #process_limit = 1024
 # }
 
-# service submission {
-#   # Max. number of SMTP Submission processes (connections)
-#   #process_limit = 1024
-# }
+service submission {
+   # Max. number of SMTP Submission processes (connections)
+   #process_limit = 1024
+}
 
 service auth {
   # auth_socket_path points to this userdb socket by default. It's typically
@@ -100,18 +104,20 @@ service auth {
   # something else than 0666 and Dovecot lets the kernel enforce the
   # permissions (e.g. 0777 allows everyone full permissions).
   unix_listener auth-userdb {
-    #mode = 0666
-    #user = 
-    #group = 
+    mode = 0660
+    user = mail
+    group = mail
   }
 
   # Postfix smtp-auth
-  #unix_listener /var/spool/postfix/private/auth {
-  #  mode = 0666
-  #}
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0666
+    user = postfix
+    group = postfix
+  }
 
   # Auth process is run as this user.
-  #user = $default_internal_user
+  user = mail
 }
 
 service auth-worker {
@@ -119,6 +125,10 @@ service auth-worker {
   # /etc/shadow. If this isn't necessary, the user should be changed to
   # $default_internal_user.
   #user = root
+
+  unix_listener auth-worker {
+    user = mail # same as above, mode and group are supported too
+  }
 }
 
 service dict {

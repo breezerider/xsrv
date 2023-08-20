@@ -1,0 +1,37 @@
+- name: install opendkim and related packages
+  apt: pkg={{ item }} state=present
+  with_items:
+    - opendkim
+    - opendkim-tools
+  tags:
+    - dependencies
+
+- name: create postfix socket directory
+  file:
+    path: "/var/spool/postfix/opendkim"
+    state: directory
+    owner: "opendkim"
+    group: "postfix"
+    mode: "0770"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: copy opendkim configuration
+  template:
+    src: "etc_opendkim.conf.j2"
+    dest: "/etc/opendkim.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart opendkim
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: generate default opendkim private key
+  command: >-
+    opendkim-genkey \
+        --directory=/etc/dkimkeys \
+        --domain={{ mailserver_fqdn }} \
+        --selector=default \
+        --nosubdomains
+  become_user: opendkim
+  notify: restart opendkim
+  ignore_errors: "{{ ansible_check_mode }}"

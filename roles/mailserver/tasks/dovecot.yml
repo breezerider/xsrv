@@ -4,24 +4,30 @@
     package:
       - dovecot-core
       - dovecot-imapd
+      - dovecot-lmtpd
+      - dovecot-managesieved
+      - dovecot-pgsql
+      - dovecot-antispam
+      - dovecot-fts-xapian
       - dovecot-ldap
 
 - name: create dovecot directories
   file:
-    path: "{{ item }}"
+    path: "{{ item.dir }}"
     state: directory
-    owner: root
+    owner: "{{ item.owner | default('root') }}"
     group: dovecot
     mode: "0770"
   with_items:
-    - "/var/mail/vhosts"
+    - { dir: "/var/mail/vhosts" }
+    - { dir: "/var/lib/dovecot/sieve/before.d", owner: "mail" }
 
 - name: copy dovecot configuration
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    owner: root
-    group: root
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
     mode: "{{ item.mode | default('0644') }}"
   with_items:
     - { src: etc_dovecot_conf.d_10-mail.conf.j2, dest: /etc/dovecot/conf.d/10-mail.conf }
@@ -29,7 +35,16 @@
     - { src: etc_dovecot_conf.d_10-auth.conf.j2, dest: /etc/dovecot/conf.d/10-auth.conf }
     - { src: etc_dovecot_conf.d_10-logging.conf.j2, dest: /etc/dovecot/conf.d/10-logging.conf }
     - { src: etc_dovecot_conf.d_10-ssl.conf.j2, dest: /etc/dovecot/conf.d/10-ssl.conf }
+    - { src: etc_dovecot_conf.d_15-lda.conf.j2, dest: /etc/dovecot/conf.d/15-lda.conf }
+    - { src: etc_dovecot_conf.d_20-imap.conf.j2, dest: /etc/dovecot/conf.d/20-imap.conf }
+    - { src: etc_dovecot_conf.d_90-antispam.conf.j2, dest: /etc/dovecot/conf.d/90-antispam.conf }
+    - { src: etc_dovecot_conf.d_90-plugin.conf.j2, dest: /etc/dovecot/conf.d/90-plugin.conf }
+    - { src: etc_dovecot_conf.d_90-sieve.conf.j2, dest: /etc/dovecot/conf.d/90-sieve.conf }
+    - { src: etc_dovecot_conf.d_auth-sql.conf.ext.j2, dest: /etc/dovecot/conf.d/auth-sql.conf.ext }
+    - { src: etc_dovecot_dovecot-sql.conf.ext.j2, dest: /etc/dovecot/dovecot-sql.conf.ext }
     - { src: etc_dovecot_dovecot-ldap.conf.ext.j2, dest: /etc/dovecot/dovecot-ldap.conf.ext, mode: "0600" }
+    - { src: var_lib_dovecot_sieve_before.d_no-spam.sieve.j2, dest: /var/lib/dovecot/sieve/before.d/no-spam.sieve, owner: "mail", group: "dovecot" }
+    - { src: var_lib_dovecot_sieve_before.d_local.sieve.j2, dest: /var/lib/dovecot/sieve/before.d/local.sieve, owner: "mail", group: "dovecot" }
   notify: restart dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 

@@ -7,19 +7,22 @@
 
 - name: generate openssl private key
   openssl_privatekey:
-    path: "/etc/ssl/private/dovecot.key"
+    path: "/etc/ssl/private/mailserver.key"
     owner: root
     group: root
     mode: "0600"
-  notify: restart dovecot
+  notify:
+    - restart dovecot
+    - restart postfix
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: generate openssl certificate signing request
   openssl_csr:
-    path: "/etc/ssl/private/dovecot.csr"
-    privatekey_path: "/etc/ssl/private/dovecot.key"
-    common_name: "{{ dovecot_fqdn }}"
+    path: "/etc/ssl/private/mailserver.csr"
+    privatekey_path: "/etc/ssl/private/mailserver.key"
+    common_name: "{{ mailserver_fqdn }}"
     key_usage: "digitalSignature,keyEncipherment"
+    subject_alt_name: 'DNS:{{ dovecot_fqdn }},DNS:{{ postfix_fqdn }}'
     owner: root
     group: root
     mode: "0600"
@@ -27,14 +30,16 @@
 
 - name: generate self-signed openssl certificate
   community.crypto.x509_certificate:
-    path: "/etc/ssl/certs/dovecot.crt"
-    privatekey_path: "/etc/ssl/private/dovecot.key"
-    csr_path: "/etc/ssl/private/dovecot.csr"
+    path: "/etc/ssl/certs/mailserver.crt"
+    privatekey_path: "/etc/ssl/private/mailserver.key"
+    csr_path: "/etc/ssl/private/mailserver.csr"
     provider: selfsigned
     owner: root
     group: root
     mode: "0644"
-  notify: restart dovecot
+  notify:
+    - restart dovecot
+    - restart postfix
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: create local certificates directory on the controller

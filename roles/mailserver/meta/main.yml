@@ -1,7 +1,7 @@
 # @tag dovecot - setup dovecot MDA/IMAP server
 
 galaxy_info:
-  role_name: mail_dovecot
+  role_name: mailserver
   author: "nodiscc <nodiscc@gmail.com>"
   description: "IMAP mailbox server"
   license: GPL-3.0
@@ -12,7 +12,9 @@ galaxy_info:
         - "11"
         - "12"
   galaxy_tags:
+    - postfix
     - dovecot
+    - opendkim
     - mail
     - email
     - email

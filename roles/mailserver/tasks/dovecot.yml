@@ -5,6 +5,7 @@
       - dovecot-core
       - dovecot-imapd
       - dovecot-lmtpd
+      - dovecot-sieve
       - dovecot-managesieved
       - dovecot-pgsql
       - dovecot-antispam
@@ -20,9 +21,9 @@
     mode: "0770"
   with_items:
     - { dir: "/var/mail/vhosts" }
-    - { dir: "/var/lib/dovecot/sieve/before.d", owner: "mail" }
+    - { dir: "/var/lib/dovecot/sieve/before.d", owner: "vmail" }
 
-- name: copy dovecot configuration
+- name: copy template-based dovecot configuration
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -30,21 +31,34 @@
     group: "{{ item.group | default('root') }}"
     mode: "{{ item.mode | default('0644') }}"
   with_items:
-    - { src: etc_dovecot_conf.d_10-mail.conf.j2, dest: /etc/dovecot/conf.d/10-mail.conf }
     - { src: etc_dovecot_conf.d_10-master.conf.j2, dest: /etc/dovecot/conf.d/10-master.conf }
     - { src: etc_dovecot_conf.d_10-auth.conf.j2, dest: /etc/dovecot/conf.d/10-auth.conf }
     - { src: etc_dovecot_conf.d_10-logging.conf.j2, dest: /etc/dovecot/conf.d/10-logging.conf }
     - { src: etc_dovecot_conf.d_10-ssl.conf.j2, dest: /etc/dovecot/conf.d/10-ssl.conf }
     - { src: etc_dovecot_conf.d_15-lda.conf.j2, dest: /etc/dovecot/conf.d/15-lda.conf }
-    - { src: etc_dovecot_conf.d_20-imap.conf.j2, dest: /etc/dovecot/conf.d/20-imap.conf }
-    - { src: etc_dovecot_conf.d_90-antispam.conf.j2, dest: /etc/dovecot/conf.d/90-antispam.conf }
-    - { src: etc_dovecot_conf.d_90-plugin.conf.j2, dest: /etc/dovecot/conf.d/90-plugin.conf }
-    - { src: etc_dovecot_conf.d_90-sieve.conf.j2, dest: /etc/dovecot/conf.d/90-sieve.conf }
-    - { src: etc_dovecot_conf.d_auth-sql.conf.ext.j2, dest: /etc/dovecot/conf.d/auth-sql.conf.ext }
+    - { src: etc_dovecot_conf.d_15-mailboxes.conf.j2, dest: /etc/dovecot/conf.d/15-mailboxes.conf }
+    - { src: etc_dovecot_conf.d_20-lmtp.conf.j2, dest: /etc/dovecot/conf.d/20-lmtp.conf }
     - { src: etc_dovecot_dovecot-sql.conf.ext.j2, dest: /etc/dovecot/dovecot-sql.conf.ext }
     - { src: etc_dovecot_dovecot-ldap.conf.ext.j2, dest: /etc/dovecot/dovecot-ldap.conf.ext, mode: "0600" }
-    - { src: var_lib_dovecot_sieve_before.d_no-spam.sieve.j2, dest: /var/lib/dovecot/sieve/before.d/no-spam.sieve, owner: "mail", group: "dovecot" }
-    - { src: var_lib_dovecot_sieve_before.d_local.sieve.j2, dest: /var/lib/dovecot/sieve/before.d/local.sieve, owner: "mail", group: "dovecot" }
+    - { src: var_lib_dovecot_sieve_before.d_local.sieve.j2, dest: /var/lib/dovecot/sieve/before.d/local.sieve, owner: "vmail", group: "dovecot" }
+  notify: restart dovecot
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: copy standard dovecot configuration
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  with_items:
+    - { src: etc_dovecot_dovecot.conf, dest: /etc/dovecot/dovecot.conf }
+    - { src: etc_dovecot_conf.d_10-mail.conf, dest: /etc/dovecot/conf.d/10-mail.conf }
+    - { src: etc_dovecot_conf.d_20-imap.conf, dest: /etc/dovecot/conf.d/20-imap.conf }
+    - { src: etc_dovecot_conf.d_90-xapian-fts.conf, dest: /etc/dovecot/conf.d/90-xapian-fts.conf }
+    - { src: etc_dovecot_conf.d_90-sieve.conf, dest: /etc/dovecot/conf.d/90-sieve.conf }
+    - { src: etc_dovecot_conf.d_auth-sql.conf.ext, dest: /etc/dovecot/conf.d/auth-sql.conf.ext }
+    - { src: var_lib_dovecot_sieve_before.d_no-spam.sieve, dest: /var/lib/dovecot/sieve/before.d/no-spam.sieve, owner: "vmail", group: "dovecot" }
   notify: restart dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 

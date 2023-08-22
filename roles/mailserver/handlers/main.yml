@@ -14,6 +14,14 @@
   when: postfix_enable_service | bool
   ignore_errors: "{{ ansible_check_mode }}"
 
+- name: restart postgrey
+  become: yes
+  service:
+    name: postgrey
+    state: restarted
+  when: postfix_enable_service | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+
 - name: restart opendkim
   become: yes
   service:

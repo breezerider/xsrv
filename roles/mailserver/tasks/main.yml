@@ -16,6 +16,8 @@
     - opendkim
     - mail
     - ssl
+  when:
+    - mailserver_https_mode == 'selfsigned'
 
 - name: import postgresql configuration tasks
   import_tasks: postgresql.yml
@@ -40,6 +42,13 @@
     - opendkim
     - mail
 
+- name: import users configuration tasks
+  import_tasks: users.yml
+  become: yes
+  tags:
+    - dovecot
+    - mail
+
 - name: import dovecot configuration tasks
   import_tasks: dovecot.yml
   become: yes
@@ -47,8 +56,8 @@
     - dovecot
     - mail
 
-- name: import users configuration tasks
-  import_tasks: users.yml
+- name: import maildirs configuration tasks
+  import_tasks: maildirs.yml
   become: yes
   tags:
     - dovecot

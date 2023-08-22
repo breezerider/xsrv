@@ -5,6 +5,7 @@
     state: "{{ item[1].state }}"
     permanent: yes
     immediate: yes
+  tags: dovecot
   with_nested:
     - ['imaps', 'imap']
     - "{{ dovecot_firewalld_zones }}"
@@ -16,6 +17,7 @@
     state: "{{ item[1].state }}"
     permanent: yes
     immediate: yes
+  tags: postfix
   with_nested:
     - ['smtp', 'smtps', 'smtp-submission']
     - "{{ postfix_firewalld_zones }}"

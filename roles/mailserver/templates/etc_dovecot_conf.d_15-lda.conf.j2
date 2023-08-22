@@ -4,11 +4,11 @@
 
 # Address to use when sending rejection mails.
 # Default is postmaster@<your domain>.
-postmaster_address = postmaster@{{ mailserver_fqdn }}
+postmaster_address = postmaster@{{ mailserver_local_mail_fqdn }}
 
 # Hostname to use in various parts of sent mails, eg. in Message-Id.
 # Default is the system's real hostname.
-hostname = {{ mailserver_fqdn }}
+hostname = {{ dovecot_fqdn }}
 
 # If user is over quota, return with temporary failure instead of
 # bouncing the mail.

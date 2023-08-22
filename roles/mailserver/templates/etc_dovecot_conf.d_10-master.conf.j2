@@ -12,13 +12,17 @@
 
 # Internal user is used by unprivileged processes. It should be separate from
 # login user, so that login processes can't disturb other processes.
-default_internal_user = mail
+default_internal_user = vmail
 
 service imap-login {
 {% if dovecot_listen_imap %}
   inet_listener imap {
      port = 143
   }
+{% else %}
+#  inet_listener imap {
+#     #port = 143
+#  }
 {% endif %}
   inet_listener imaps {
     port = 993
@@ -105,8 +109,8 @@ service auth {
   # permissions (e.g. 0777 allows everyone full permissions).
   unix_listener auth-userdb {
     mode = 0660
-    user = mail
-    group = mail
+    user = vmail
+    group = vmail
   }
 
   # Postfix smtp-auth
@@ -117,7 +121,7 @@ service auth {
   }
 
   # Auth process is run as this user.
-  user = mail
+  user = vmail
 }
 
 service auth-worker {
@@ -127,7 +131,7 @@ service auth-worker {
   #user = root
 
   unix_listener auth-worker {
-    user = mail # same as above, mode and group are supported too
+    user = vmail # same as above, mode and group are supported too
   }
 }
 
@@ -139,4 +143,14 @@ service dict {
     #user = 
     #group = 
   }
+}
+
+service managesieve-login {
+  inet_listener sieve {
+    port = 4190
+  }
+  # Number of connections to handle before starting a new process. Typically
+  # the only useful values are 0 (unlimited) or 1. 1 is more secure, but 0
+  # is faster. <doc/wiki/LoginProcess.txt>
+  service_count = 1
 }

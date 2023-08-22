@@ -1,8 +1,8 @@
-require ["fileinto", "envelope"];
+require ["mailbox", "fileinto", "envelope"];
 
 # Move local mail to dedicated INBOX folder
-if anyof(address :is "to" "{{ xsrv_admin_email }}",
-         envelope :is "from" "www-data@{{ mailserver_fqdn }}") {
+if anyof(address :is "to" "root@{{ mailserver_local_mail_fqdn }}",
+         envelope :is "from" "www-data@{{ mailserver_local_mail_fqdn }}") {
   fileinto :create "INBOX.Local";
 } else {
   # The rest goes into INBOX

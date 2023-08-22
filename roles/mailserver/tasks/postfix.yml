@@ -1,17 +1,18 @@
 - name: install postfix and related packages
-  apt: pkg={{ item }} state=present
-  with_items:
-    - libsasl2-modules
-    - postfix
-    - postfix-pcre
-    - postfix-pgsql
-    - postgrey
-    - sasl2-bin
-    - postfix-policyd-spf-python
+  apt:
+    state: present
+    package:
+      - libsasl2-modules
+      - postfix
+      - postfix-pcre
+      - postfix-pgsql
+      - postgrey
+      - sasl2-bin
+      - postfix-policyd-spf-python
   tags:
     - dependencies
 
-- name: create postfix directories
+- name: create postfix/postgrey directories
   file:
     path: "{{ item.dir }}"
     state: directory
@@ -20,8 +21,9 @@
     mode: "0770"
   with_items:
     - { dir: "/etc/postfix/maps" }
+    - { dir: "/var/spool/postfix/postgrey/", owner: "postgrey", group: "postgrey" }
 
-- name: copy postfix configuration
+- name: copy template-based postfix configuration
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -29,11 +31,9 @@
     group: "{{ item.group | default('root') }}"
     mode: "{{ item.mode | default('0644') }}"
   with_items:
-    - { src: etc_postfix_maps_smtp_header_checks.pcre.j2, dest: /etc/postfix/maps/smtp_header_checks.pcre }
-    - { src: etc_postfix_import-virtual.sql.j2, dest: /etc/postfix/import-virtual.sql }
+    - { src: etc_postfix_import-pgsql-virtual.sql.j2, dest: /etc/postfix/import-virtual.sql }
     - { src: etc_postfix_main.cf.j2, dest: /etc/postfix/main.cf }
     - { src: etc_postfix_sasl_passwd.j2, dest: /etc/postfix/sasl_passwd, mode: "0600" }
-    - { src: etc_postfix_master.cf.j2, dest: /etc/postfix/master.cf }
     - { src: etc_postfix_pgsql-virtual-alias-maps.cf.j2, dest: /etc/postfix/pgsql-virtual-alias-maps.cf }
     - { src: etc_postfix_pgsql-virtual-mailbox-domains.cf.j2, dest: /etc/postfix/pgsql-virtual-mailbox-domains.cf }
     - { src: etc_postfix_pgsql-virtual-mailbox-maps.cf.j2, dest: /etc/postfix/pgsql-virtual-mailbox-maps.cf }
@@ -41,6 +41,22 @@
     - { src: etc_postfix_ldap-virtual-mailbox-domains.cf.j2, dest: /etc/postfix/ldap-virtual-mailbox-domains.cf }
     - { src: etc_postfix_ldap-virtual-mailbox-maps.cf.j2, dest: /etc/postfix/ldap-virtual-mailbox-maps.cf }
   notify: restart postfix
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: copy standard postfix configuration
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  with_items:
+    - { src: etc_postfix_maps_smtp_header_checks.pcre, dest: /etc/postfix/maps/smtp_header_checks.pcre }
+    - { src: etc_postfix_master.cf, dest: /etc/postfix/master.cf }
+    - { src: etc_default_postgrey, dest: /etc/default/postgrey }
+  notify:
+    - restart postfix
+    - restart postgrey
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: Process import-virtual.sql
@@ -66,4 +82,22 @@
   when: mail_smtp_relay_sasl_credentials is defined and mail_smtp_relay_sasl_credentials|length and mail_smtp_relay_host_name is defined and mail_smtp_relay_host_name|length
   notify: restart postfix
 
+  ignore_errors: "{{ ansible_check_mode }}"
+
+##### SERVICE #####
+
+- name: start/stop/enable/disable postfix service
+  service:
+    name: postfix
+    state: "{{ 'started' if postfix_enable_service else 'stopped' }}"
+    enabled: "{{ 'yes' if postfix_enable_service else 'no' }}"
+  tags: services
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: start/stop/enable/disable postgrey service
+  service:
+    name: postgrey
+    state: "{{ 'started' if postfix_enable_service else 'stopped' }}"
+    enabled: "{{ 'yes' if postfix_enable_service else 'no' }}"
+  tags: services
   ignore_errors: "{{ ansible_check_mode }}"

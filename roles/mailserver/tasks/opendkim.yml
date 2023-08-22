@@ -1,8 +1,9 @@
 - name: install opendkim and related packages
-  apt: pkg={{ item }} state=present
-  with_items:
-    - opendkim
-    - opendkim-tools
+  apt:
+    state: present
+    package:
+      - opendkim
+      - opendkim-tools
   tags:
     - dependencies
 
@@ -34,4 +35,14 @@
         --nosubdomains
   become_user: opendkim
   notify: restart opendkim
+  ignore_errors: "{{ ansible_check_mode }}"
+
+##### SERVICE #####
+
+- name: start/stop/enable/disable opendkim service
+  service:
+    name: opendkim
+    state: "{{ 'started' if opendkim_enable_service else 'stopped' }}"
+    enabled: "{{ 'yes' if opendkim_enable_service else 'no' }}"
+  tags: services
   ignore_errors: "{{ ansible_check_mode }}"

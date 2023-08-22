@@ -4,28 +4,13 @@ mail_db_user: "mailuser"
 mail_db_password: "CHANGEME"
 mail_db_name: "mailserver"
 mail_db_host: "localhost"
+# domain name used for local mail
+mailserver_local_mail_fqdn: "CHANGEME.org"
+# domain name used to access autoconfig server
 mailserver_autoconfig_fqdn: "autoconfig.CHANGEME.org"
-mailserver_virtual_domains:
-  - name: "{{ mailserver_fqdn }}"
-    pk_id: 1
-mailserver_virtual_users: [ ]
-  # - account: "user@{{ mailserver_fqdn }}"
-  #   domain: "{{ mailserver_fqdn }}"
-  #   password: TODO
-  #   domain_pk_id: 1
-mailserver_virtual_aliases:
-  - source: "root@{{ mailserver_fqdn }}"
-    destination: "{{ xsrv_admin_email }}"
-    domain_pk_id: 1
-  - source: "postmaster@{{ mailserver_fqdn }}"
-    destination: "{{ xsrv_admin_email }}"
-    domain_pk_id: 1
-  - source: "webmaster@{{ mailserver_fqdn }}"
-    destination: "{{ xsrv_admin_email }}"
-    domain_pk_id: 1
-  - source: "abuse@{{ mailserver_fqdn }}"
-    destination: "{{ xsrv_admin_email }}"
-    domain_pk_id: 1
+mailserver_virtual_domains: []
+mailserver_virtual_users: []
+mailserver_virtual_aliases: []
 ##### DOVECOT MAIL SERVER (IMAP/MDA) #####
 # domain name used to access the IMAP server
 dovecot_fqdn: "{{ mailserver_fqdn }}"

@@ -1,0 +1,14 @@
+- name: copy autoconfig apache virtualhost configuration
+  template:
+    src: "etc_apache2_sites-available_autoconfig.j2"
+    dest: "/etc/apache2/sites-available/autoconfig.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: reload apache
+
+- name: enable autoconfig apache virtualhost configuration
+  command:
+    cmd: "a2ensite autoconfig"
+    creates: "/etc/apache2/sites-enabled/autoconfig.conf"
+  notify: reload apache

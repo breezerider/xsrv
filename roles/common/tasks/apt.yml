@@ -44,8 +44,14 @@
     state: present
     package:
       - aptitude
-      - unattended-upgrades
+      - apticron
       - apt-listchanges
+      - unattended-upgrades
+
+- name: apticron email configuration
+  template:
+    src: etc_apticron_apticron.conf.j2
+    dest: /etc/apticron/apticron.conf
 
 ##### APT-LISTBUGS #####
 

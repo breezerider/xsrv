@@ -33,6 +33,7 @@
     lc_ctype: 'en_US.UTF-8'
     encoding: 'UTF8'
     owner: '{{ gitea_db_user }}'
+    template: 'template0'
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: grant privileges on gitea database to gitea postgresql user

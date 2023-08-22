@@ -4,6 +4,11 @@
     - common
     - checks
 
+- name: import prerequisities
+  import_tasks: prerequisities.yml
+  tags:
+    - common
+
 - name: import hostname configuration tasks
   import_tasks: hostname.yml
   become: yes

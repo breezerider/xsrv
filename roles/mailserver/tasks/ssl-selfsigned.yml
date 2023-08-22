@@ -22,7 +22,7 @@
     privatekey_path: "/etc/ssl/private/{{mailserver_fqdn }}.key"
     common_name: "{{ mailserver_fqdn }}"
     key_usage: "digitalSignature,keyEncipherment"
-    subject_alt_name: 'DNS:{{ dovecot_fqdn }},DNS:{{ postfix_fqdn }}'
+    subject_alt_name: 'DNS:{{ dovecot_fqdn }},DNS:{{ postfix_fqdn }},DNS:{{ mailserver_autoconfig_fqdn }}'
     owner: root
     group: root
     mode: "0600"

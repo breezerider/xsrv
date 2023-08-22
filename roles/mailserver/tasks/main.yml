@@ -85,6 +85,18 @@
     - dovecot
     - mail
 
+- name: import autoconfig configuration tasks
+  import_tasks: autoconfig.yml
+  become: yes
+  tags:
+    - mail
+
+- name: import apache configuration tasks
+  import_tasks: apache.yml
+  become: yes
+  tags:
+    - mail
+
 - name: import fail2ban configuration tasks
   import_tasks: fail2ban.yml
   become: yes

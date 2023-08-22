@@ -15,6 +15,9 @@
     state: present
     no_password_changes: yes
   when: postfix_auth_provider == "pgsql"
+  tags:
+    - postfix
+    - dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: set mail server postgresql user password
@@ -25,6 +28,9 @@
     password: "{{ mail_db_password }}"
   when: mail_db_password is defined and postfix_auth_provider == "pgsql"
   no_log: True
+  tags:
+    - postfix
+    - dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: create mail server postgresql database
@@ -36,6 +42,9 @@
     encoding: 'UNICODE'
     owner: '{{ mail_db_user }}'
   when: postfix_auth_provider == "pgsql"
+  tags:
+    - postfix
+    - dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: grant privileges on mail server database to mail server postgresql user
@@ -47,4 +56,7 @@
     type: database
     role: "{{ mail_db_user }}"
   when: postfix_auth_provider == "pgsql"
+  tags:
+    - postfix
+    - dovecot
   ignore_errors: "{{ ansible_check_mode }}"

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+MAILROOT=/var/mail/vhosts/
+DOMAIN=$1
+ACCOUNT=$2
+shift 2
+
+ACCOUNT=${ACCOUNT%*@${DOMAIN}}
+MAILDIR="${MAILROOT}/${DOMAIN}/${ACCOUNT}"
+
+mkdir -p "${MAILDIR}"
+
+for FOLDER in "$@"; do
+  mkdir -p "${MAILDIR}/.${FOLDER}"/{cur,tmp,new}
+  touch "${MAILDIR}/.${FOLDER}"/maildirfolder
+  chown -R vmail:vmail "${MAILDIR}/.${FOLDER}"
+done

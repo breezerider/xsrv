@@ -1,0 +1,35 @@
+- name: Ensure mail domain directories are in place
+  file:
+    state: directory
+    path: "/var/mail/vhosts/{{ item.name }}"
+    owner: vmail
+    group: dovecot
+    mode: 0770
+  tags: dovecot
+  with_items: '{{ mailserver_virtual_domains }}'
+
+- name: Ensure mail account directories are in place
+  file:
+    state: directory
+    path: "/var/mail/vhosts/{{ item.domain }}/{{ item.account }}"
+    owner: vmail
+    group: dovecot
+  tags: dovecot
+  with_items: '{{ mailserver_virtual_users }}'
+
+- name: copy mkmaildir
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  tags: dovecot
+  with_items:
+  - { src: usr_local_bin_mkmaildir, dest: /usr/local/bin/mkmaildir, mode: "0755" }
+
+- name: create mail account folders
+  command: >-
+    mkmaildir "{{ item.domain }}" "{{ item.account }}" Sent Drafts Trash
+  tags: dovecot
+  with_items: "{{ mailserver_virtual_users }}"

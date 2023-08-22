@@ -3,6 +3,7 @@
     name: "vmail"
     state: "present"
     gid: 5000
+  tags: dovecot
 
 - name: Create vmail user
   user:
@@ -12,20 +13,4 @@
     uid: 5000
     home: "/var/mail/vhosts/"
     shell: "/usr/sbin/nologin"
-
-- name: Ensure mail domain directories are in place
-  file:
-    state: directory
-    path: "/var/mail/vhosts/{{ item.name }}"
-    owner: vmail
-    group: dovecot
-    mode: 0770
-  with_items: '{{ mail_virtual_domains }}'
-
-- name: Ensure mail account directories are in place
-  file:
-    state: directory
-    path: "/var/mail/vhosts/{{ item.domain }}/{{ item.account }}"
-    owner: vmail
-    group: dovecot
-  with_items: '{{ mail_virtual_users }}'
+  tags: dovecot

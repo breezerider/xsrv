@@ -122,9 +122,13 @@ auth_mechanisms = plain login
 #!include auth-system.conf.ext
 {% if dovecot_auth_provider == "pgsql" %}
 !include auth-sql.conf.ext
+{% else %}
+#!include auth-sql.conf.ext
 {% endif %}
 {% if dovecot_auth_provider == "ldap" %}
 !include auth-ldap.conf.ext
+{% else %}
+#!include auth-ldap.conf.ext
 {% endif %}
 #!include auth-passwdfile.conf.ext
 #!include auth-checkpassword.conf.ext

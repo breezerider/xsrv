@@ -85,6 +85,7 @@ smtpd_recipient_restrictions =
   reject_non_fqdn_recipient
   reject_unknown_recipient_domain
   check_policy_service unix:private/policyd-spf
+  check_policy_service unix:postgrey/socket
   permit
 
 policy-spf_time_limit = 3600s
@@ -116,13 +117,13 @@ virtual_alias_maps = pgsql:/etc/postfix/pgsql-virtual-alias-maps.cf
 local_recipient_maps = $virtual_mailbox_maps
 {% endif %}
 {% if postfix_auth_provider == "ldap" %}
-virtual_mailbox_domains = pgsql:/etc/postfix/ldap-virtual-mailbox-domains.cf
-virtual_mailbox_maps = pgsql:/etc/postfix/ldap-virtual-mailbox-maps.cf
-virtual_alias_maps = pgsql:/etc/postfix/ldap-virtual-alias-maps.cf
+virtual_mailbox_domains = ldap:/etc/postfix/ldap-virtual-mailbox-domains.cf
+virtual_mailbox_maps = ldap:/etc/postfix/ldap-virtual-mailbox-maps.cf
+virtual_alias_maps = ldap:/etc/postfix/ldap-virtual-alias-maps.cf
 local_recipient_maps = $virtual_mailbox_maps
 {% endif %}
 
-# Milters: Rspamd
+# Milters: OpenDKIM
 smtpd_milters = unix:opendkim/opendkim.sock
 non_smtpd_milters = $smtpd_milters
 milter_protocol = 2

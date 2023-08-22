@@ -10,6 +10,7 @@
     dest: /etc/ansible/facts.d/postfix.fact
     mode: "0644"
   notify: update ansible facts
+  tags: postfix
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: create opendkim fact file
@@ -18,6 +19,7 @@
     dest: /etc/ansible/facts.d/opendkim.fact
     mode: "0644"
   notify: update ansible facts
+  tags: dovecot
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: create dovecot fact file
@@ -26,4 +28,5 @@
     dest: /etc/ansible/facts.d/dovecot.fact
     mode: "0644"
   notify: update ansible facts
+  tags: opendkim
   ignore_errors: "{{ ansible_check_mode }}"

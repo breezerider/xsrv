@@ -11,7 +11,7 @@ ansible_become_pass: "CHANGEME"
 # default global username/password/email for applications/services admin accounts
 xsrv_admin_username: "CHANGEME"
 xsrv_admin_password: "CHANGEME20"
-xsrv_admin_email: "CHANGEME@CHANGEME.org"
+xsrv_admin_email: "CHANGEME@{{ mailserver_fqdn }}"
 
 ##### APACHE - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/apache/defaults/main.yml
 apache_letsencrypt_email: "{{ xsrv_admin_email }}"
@@ -69,6 +69,12 @@ gotty_auth_password: "CHANGEME"
 
 ##### MAILSERVER - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
 mail_db_password: "CHANGEME20"
+
+mailserver_virtual_users:
+  - account: "CHANGEME@{{ mailserver_fqdn }}"
+    domain: "{{ mailserver_fqdn }}"
+    password: "CHANGEME"
+    domain_pk_id: 1
 
 ##### POSTFIX - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
 postfix_ldap_bind_password: "CHANGEME"

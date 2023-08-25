@@ -10,8 +10,14 @@ ssl = {{ 'required' if dovecot_ssl_required else 'yes' }}
 # dropping root privileges, so keep the key file unreadable by anyone but
 # root. Included doc/mkcert.sh can be used to easily generate self-signed
 # certificate, just make sure to update the domains in dovecot-openssl.cnf
-ssl_cert = </etc/ssl/certs/dovecot.crt
-ssl_key = </etc/ssl/private/dovecot.key
+{% if mailserver_https_mode == 'selfsigned' %}
+ssl_cert = </etc/ssl/certs/{{ mailserver }}.crt
+ssl_key = </etc/ssl/private/{{ mailserver }}.key
+{% endif %}
+{% if mailserver_https_mode == 'letsencrypt' %}
+ssl_cert = </etc/letsencrypt/live/{{ mailserver_fqdn }}/fullchain.pem
+ssl_key = </etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem
+{% endif %}
 
 # If key file is password protected, give the password here. Alternatively
 # give it when starting dovecot with -p parameter. Since this file is often
@@ -53,16 +59,16 @@ ssl_client_ca_dir = /etc/ssl/certs
 # Generate new params with `openssl dhparam -out /etc/dovecot/dh.pem 4096`
 # Or migrate from old ssl-parameters.dat file with the command dovecot
 # gives on startup when ssl_dh is unset.
-ssl_dh = </usr/share/dovecot/dh.pem
+ssl_dh = </etc/ssl/private/dhparam4096.pem
 
 # Minimum SSL protocol version to use. Potentially recognized values are SSLv3,
 # TLSv1, TLSv1.1, and TLSv1.2, depending on the OpenSSL version used.
-#ssl_min_protocol = TLSv1
+ssl_min_protocol = TLSv1.2
 
 # SSL ciphers to use, the default is:
 #ssl_cipher_list = ALL:!kRSA:!SRP:!kDHd:!DSS:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK:!RC4:!ADH:!LOW@STRENGTH
 # To disable non-EC DH, use:
-#ssl_cipher_list = ALL:!DH:!kRSA:!SRP:!kDHd:!DSS:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK:!RC4:!ADH:!LOW@STRENGTH
+ssl_cipher_list = ALL:!DH:!kRSA:!SRP:!kDHd:!DSS:!aNULL:!eNULL:!EXPORT:!DES:!3DES:!MD5:!PSK:!RC4:!ADH:!LOW@STRENGTH
 
 # Colon separated list of elliptic curves to use. Empty value (the default)
 # means use the defaults from the SSL library. P-521:P-384:P-256 would be an

@@ -48,13 +48,19 @@ unverified_recipient_reject_code = 554
 unverified_sender_reject_code = 554
 
 # TLS parameters
-smtpd_tls_mandatory_protocols=!SSLv2,!SSLv3
-smtp_tls_mandatory_protocols=!SSLv2,!SSLv3
-smtp_tls_protocols = !SSLv2,!SSLv3
-smtpd_tls_protocols = !SSLv2,!SSLv3
-smtpd_tls_cert_file=/etc/ssl/certs/mailserver.crt
-smtpd_tls_key_file=/etc/ssl/private/mailserver.key
-smtpd_use_tls=yes
+smtpd_tls_mandatory_protocols = >=TLSv1.2
+smtp_tls_mandatory_protocols = >=TLSv1.2
+smtp_tls_protocols = >=TLSv1.2
+smtpd_tls_protocols = >=TLSv1.2
+{% if mailserver_https_mode == 'selfsigned' %}
+smtpd_tls_cert_file = /etc/ssl/certs/{{ mailserver }}.crt
+smtpd_tls_key_file = /etc/ssl/private/{{ mailserver }}.key
+{% endif %}
+{% if mailserver_https_mode == 'letsencrypt' %}
+smtpd_tls_cert_file = /etc/letsencrypt/live/{{ mailserver_fqdn }}/fullchain.pem
+smtpd_tls_key_file = /etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem
+{% endif %}
+smtpd_use_tls = yes
 smtpd_tls_auth_only = yes
 smtp_tls_security_level = may
 smtp_tls_loglevel = 2
@@ -63,7 +69,7 @@ smtp_tls_note_starttls_offer = yes
 smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
 # http://www.postfix.org/FORWARD_SECRECY_README.html
 smtp_tls_ciphers = medium
-smtpd_tls_dh1024_param_file = /etc/ssl/private/dhparam2048.pem
+smtpd_tls_dh1024_param_file = /etc/ssl/private/dhparam4096.pem
 
 smtpd_sasl_type = dovecot
 smtpd_sasl_path = private/auth
@@ -84,7 +90,7 @@ smtpd_recipient_restrictions =
   reject_non_fqdn_hostname
   reject_non_fqdn_recipient
   reject_unknown_recipient_domain
-  check_policy_service unix:private/policyd-spf
+  check_policy_service unix:private/policy-spf
   check_policy_service unix:postgrey/socket
   permit
 
@@ -98,7 +104,11 @@ myorigin = $mydomain
 alias_maps = hash:/etc/aliases
 alias_database = hash:/etc/aliases
 mydestination = localhost
+{% if postfix_smtp_relay_host_name is defined and postfix_smtp_relay_host_name|length %}
+relayhost = [{{ postfix_smtp_relay_host_name }}]:{{ postfix_smtp_relay_host_port | default(25) }}
+{% else %}
 relayhost =
+{% endif %}
 mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
 #mailbox_command = procmail -a "$EXTENSION"
 mailbox_size_limit = 0
@@ -143,7 +153,7 @@ postscreen_dnsbl_threshold = 3
 postscreen_dnsbl_action = enforce
 postscreen_greet_action = enforce
 
-{% if postfix_mail_header_privacy == 1 %}
+{% if postfix_mail_header_privacy == postfix_mail_header_privacy|bool %}
 # Remove local client IP from headers
 smtp_header_checks = pcre:/etc/postfix/maps/smtp_header_checks.pcre
 {% endif %}

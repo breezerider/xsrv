@@ -16,25 +16,38 @@
     mode: "0770"
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: copy opendkim configuration
+- name: setup opendkim configuration
   template:
-    src: "etc_opendkim.conf.j2"
-    dest: "/etc/opendkim.conf"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: "root"
     group: "root"
     mode: "0644"
   notify: restart opendkim
+  with_items:
+    - { src: "etc_opendkim.conf.j2", dest: "/etc/opendkim.conf" }
+    - { src: "etc_opendkim-keytable.j2", dest: "/etc/opendkim-keytable" }
+    - { src: "etc_opendkim-signingtable.j2", dest: "/etc/opendkim-signingtable" }
+    - { src: "etc_opendkim-trustedhosts.j2", dest: "/etc/opendkim-trustedhosts" }
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: create directories for virtual domain private keys
+  file:
+    path: "/etc/dkimkeys/{{ item.name }}"
+    state: directory
+    owner: "opendkim"
+    group: "opendkim"
+    mode: "0770"
+  with_items: "{{ mailserver_virtual_domains }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
 - name: generate default opendkim private key
-  command: >-
-    opendkim-genkey \
-        --directory=/etc/dkimkeys \
-        --domain={{ mailserver_fqdn }} \
-        --selector=default \
-        --nosubdomains
+  command:
+    cmd: "opendkim-genkey --directory=/etc/dkimkeys/{{ item.name }} --domain={{ item.name }} --selector=default --nosubdomains"
+    creates: "/etc/dkimkeys/{{ item.name }}/default.private"
   become_user: opendkim
   notify: restart opendkim
+  with_items: "{{ mailserver_virtual_domains }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
 ##### SERVICE #####

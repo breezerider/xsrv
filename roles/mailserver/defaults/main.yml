@@ -8,8 +8,15 @@ mail_db_host: "localhost"
 mailserver_local_mail_fqdn: "CHANGEME.org"
 # domain name used to access autoconfig server
 mailserver_autoconfig_fqdn: "autoconfig.CHANGEME.org"
+# letsencrypt.org server address
+mailserver_letsencrypt_server: "https://acme-v02.api.letsencrypt.org/directory"
+# e-mail address to register a letsencrypt.org account
+mailserver_letsencrypt_email: "CHANGEME"
+# list of virtual domains
 mailserver_virtual_domains: []
+# list of virtual users
 mailserver_virtual_users: []
+# list of virtual aliases
 mailserver_virtual_aliases: []
 ##### DOVECOT MAIL SERVER (IMAP/MDA) #####
 # domain name used to access the IMAP server
@@ -56,6 +63,12 @@ postfix_ldap_base: "ou=users,dc=CHANGEME,dc=org"
 postfix_ldap_bind_dn: "cn=bind,ou=system,dc=CHANGEME,dc=org"
 # password for the "bind" LDAP user
 postfix_ldap_bind_password: "CHANGEME"
+# SMTP relay host name
+#postfix_smtp_relay_host_name: "smtp.relay.host"
+# SMTP relay port
+#postfix_smtp_relay_host_port: 25
+# SMTP relay SASL credentials
+#postfix_smtp_relay_sasl_credentials: "CHANGEME"
 # sanitize mail headers using PCREs
 postfix_mail_header_privacy: no
 # authentication provider (pgsql|ldap)

@@ -1,9 +1,12 @@
-- name: copy dovecot fail2ban jail config
-  template:
-    src: etc_fail2ban_jail.d_dovecot.conf.j2
-    dest: /etc/fail2ban/jail.d/dovecot.conf
+- name: copy dovecot & postfix fail2ban jail config
+  copy:
+    src: "etc_fail2ban_jail.d_{{ item }}.conf"
+    dest: "/etc/fail2ban/jail.d/{{ item }}.conf"
     owner: root
     group: root
     mode: "0644"
   tags: fail2ban
+  with_items:
+    - dovecot
+    - postfix
   notify: reload fail2ban

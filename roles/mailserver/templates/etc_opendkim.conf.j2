@@ -17,13 +17,10 @@ Mode			sv
 SubDomains		no
 OversignHeaders		From
 
-# Signing domain, selector, and key (required). For example, perform signing
-# for domain "example.com" with selector "2020" (2020._domainkey.example.com),
-# using the private key stored in /etc/dkimkeys/example.private. More granular
-# setup options can be found in /usr/share/doc/opendkim/README.opendkim.
-Domain			{{ mailserver_fqdn }}
-Selector		default
-KeyFile			/etc/dkimkeys/default.private
+ExternalIgnoreList      refile:/etc/opendkim-trustedhosts
+InternalHosts           refile:/etc/opendkim-trustedhosts
+KeyTable                refile:/etc/opendkim-keytable
+SigningTable            refile:/etc/opendkim-signingtable
 
 # In Debian, opendkim runs as user "opendkim". A umask of 007 is required when
 # using a local socket with MTAs that access the socket as a non-privileged

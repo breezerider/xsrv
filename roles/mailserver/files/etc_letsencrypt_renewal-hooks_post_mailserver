@@ -1,0 +1,5 @@
+#!/bin/bash
+# restart active mailserver services
+for service in postfix dovecot; do
+    systemctl is-active --quiet $service && systemctl restart $service
+done

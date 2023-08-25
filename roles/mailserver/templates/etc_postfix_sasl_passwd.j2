@@ -1,5 +1,5 @@
 {% if postfix_smtp_relay_sasl_credentials is defined and postfix_smtp_relay_sasl_credentials|length and postfix_smtp_relay_host_name is defined and postfix_smtp_relay_host_name|length %}
-[{{ mail_smtp_relay_host_name }}]:{{ mail_smtp_relay_host_port | default(25) }} {{ mail_smtp_relay_sasl_credentials }}
+[{{ postfix_smtp_relay_host_name }}]:{{ postfix_smtp_relay_host_port | default(25) }} {{ postfix_smtp_relay_sasl_credentials }}
 {% endif %}
 
 

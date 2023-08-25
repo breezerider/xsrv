@@ -1,0 +1,97 @@
+- name: add group name ssl-cert for SSL certificates
+  group:
+    name: ssl-cert
+    state: present
+
+- name: install LetsEncrypt certbot
+  apt:
+    pkg: certbot
+    state: present
+
+- name: create directory for LetsEncrypt configuration and certificates
+  file:
+    state: directory
+    path: /etc/letsencrypt
+    group: root
+    owner: root
+
+- name: configure LetsEncrypt
+  template:
+    src: etc_letsencrypt_cli.conf.j2
+    dest: /etc/letsencrypt/cli.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: create directory for letsencrypt renewal hooks
+  file:
+    state: directory
+    path: "/etc/letsencrypt/renewal-hooks/{{ item }}"
+    group: root
+    owner: root
+    mode: 0755
+  with_items:
+    - pre
+    - post
+
+- name: install certificate renewal script for LetsEncrypt
+  copy:
+    src: usr_local_bin_letsencrypt-gencert
+    dest: /usr/local/bin/letsencrypt-gencert
+    owner: root
+    group: root
+    mode: 0755
+
+- name: create live directory for LetsEncrypt cron job
+  file:
+    state: directory
+    path: /etc/letsencrypt/live
+    group: root
+    owner: root
+
+- name: request an SSL certificate for {{ mailserver_fqdn }}, {{ postfix_fqdn }} and {{ dovecot_fqdn }} from LetsEncrypt
+  command:
+    cmd: "letsencrypt-gencert {{ mailserver_fqdn }} {{ postfix_fqdn }} {{ dovecot_fqdn }}"
+    creates: "/etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem"
+
+- name: modify permissions to allow ssl-cert group access
+  file:
+    path: /etc/letsencrypt/archive
+    owner: root
+    group: ssl-cert
+    mode: 0750
+
+- name: install Let's Encrypt renewal hook for mailserver
+  copy:
+    src: etc_letsencrypt_renewal-hooks_post_mailserver
+    dest: /etc/letsencrypt/renewal-hooks/post/mailserver
+    owner: root
+    group: root
+    mode: 0755
+
+- name: copy and activate crontab entry for certificate renewal from LetsEncrypt
+  copy:
+    src: etc_cron-daily_letsencrypt-renew
+    dest: /etc/cron.daily/letsencrypt-renew
+    owner: root
+    group: root
+    mode: 0755
+
+# deactivate default crontab entry
+- name: check if /etc/cron.d/certbot exists
+  stat:
+    path: "/etc/cron.d/certbot"
+  register: check_crond_cerbot
+
+- name: deactivate /etc/cron.d/certbot by renaming it to certbot~
+  copy:
+    remote_src: true
+    src: "/etc/cron.d/certbot"
+    dest: "/etc/cron.d/certbot~"
+  when: check_crond_cerbot.stat.exists
+
+- name: remove /etc/cron.d/certbot
+  file:
+    path: "/etc/cron.d/certbot"
+    state: absent
+  when: check_crond_cerbot.stat.exists

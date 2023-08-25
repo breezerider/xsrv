@@ -19,6 +19,28 @@
   when:
     - mailserver_https_mode == 'selfsigned'
 
+- name: import Let'sEncrypt configuration tasks
+  import_tasks: letsencrypt.yml
+  become: yes
+  tags:
+    - dovecot
+    - postfix
+    - opendkim
+    - mail
+    - ssl
+  when:
+    - mailserver_https_mode == 'letsencrypt'
+
+- name: import SSL configuration tasks
+  import_tasks: ssl.yml
+  become: yes
+  tags:
+    - dovecot
+    - postfix
+    - opendkim
+    - mail
+    - ssl
+
 - name: import postgresql configuration tasks
   import_tasks: postgresql.yml
   become: yes

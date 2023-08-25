@@ -1,0 +1,3 @@
+{% for virtual_domain in mailserver_virtual_domains %}
+*@{{ virtual_domain.name }} default._domainkey.{{ virtual_domain.name }}
+{% endfor %}

@@ -21,7 +21,7 @@
     mode: "0770"
   with_items:
     - { dir: "/etc/postfix/maps" }
-    - { dir: "/var/spool/postfix/postgrey/", owner: "postgrey", group: "postgrey" }
+    - { dir: "/var/spool/postfix/postgrey/", owner: "postgrey", group: "postfix" }
 
 - name: copy template-based postfix configuration
   template:
@@ -79,9 +79,8 @@
 - name: Process sasl_passwd
   shell: |
     postmap /etc/postfix/sasl_passwd
-  when: mail_smtp_relay_sasl_credentials is defined and mail_smtp_relay_sasl_credentials|length and mail_smtp_relay_host_name is defined and mail_smtp_relay_host_name|length
+  when: postfix_smtp_relay_sasl_credentials is defined and postfix_smtp_relay_sasl_credentials|length and postfix_smtp_relay_host_name is defined and postfix_smtp_relay_host_name|length
   notify: restart postfix
-
   ignore_errors: "{{ ansible_check_mode }}"
 
 ##### SERVICE #####

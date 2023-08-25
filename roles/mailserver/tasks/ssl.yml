@@ -1,0 +1,4 @@
+- name: Create strong Diffie-Hellman group (4096 bits)
+  command:
+    cmd: "openssl dhparam -out /etc/ssl/private/dhparam4096.pem 4096"
+    creates: /etc/ssl/private/dhparam4096.pem

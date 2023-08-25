@@ -1,0 +1,20 @@
+#!/bin/bash
+if [ $# -lt 0 ]; then
+  echo "usage: $0 fqdn_0 [fqdn_1] [fqdn_2] ..."
+  exit 1
+fi
+
+domains=$1
+shift
+for fqdn in $(printf "%s\n" "$@" | sort -u); do
+  if (getent hosts "$fqdn" > /dev/null); then
+    domains="$domains,$fqdn";
+  fi
+done
+# We are using the "standalone" letsencrypt plugin, which runs its own
+# webserver, so we need to temporarily free up the HTTP(S) ports by stopping
+# our own Apache.
+apache_active=$(systemctl is-active --quiet apache2.service && echo "1" || echo "0")
+[ "$apache_active" -eq "1" ] && systemctl stop apache2.service
+certbot certonly -c /etc/letsencrypt/cli.conf --domains $domains
+[ "$apache_active" -eq "1" ] && systemctl start apache2.service

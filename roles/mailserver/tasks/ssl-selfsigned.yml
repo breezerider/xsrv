@@ -18,8 +18,8 @@
 
 - name: generate openssl certificate signing request
   openssl_csr:
-    path: "/etc/ssl/private/mailserver.csr"
-    privatekey_path: "/etc/ssl/private/mailserver.key"
+    path: "/etc/ssl/private/{{ mailserver }}.csr"
+    privatekey_path: "/etc/ssl/private/{{mailserver_fqdn }}.key"
     common_name: "{{ mailserver_fqdn }}"
     key_usage: "digitalSignature,keyEncipherment"
     subject_alt_name: 'DNS:{{ dovecot_fqdn }},DNS:{{ postfix_fqdn }}'
@@ -30,9 +30,9 @@
 
 - name: generate self-signed openssl certificate
   community.crypto.x509_certificate:
-    path: "/etc/ssl/certs/mailserver.crt"
-    privatekey_path: "/etc/ssl/private/mailserver.key"
-    csr_path: "/etc/ssl/private/mailserver.csr"
+    path: "/etc/ssl/certs/{{ mailserver }}.crt"
+    privatekey_path: "/etc/ssl/private/{{ mailserver }}.key"
+    csr_path: "/etc/ssl/private/{{ mailserver }}.csr"
     provider: selfsigned
     owner: root
     group: root

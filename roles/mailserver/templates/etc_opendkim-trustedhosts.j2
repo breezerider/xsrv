@@ -1,0 +1,5 @@
+127.0.0.1
+localhost
+{% for virtual_domain in mailserver_virtual_domains %}
+*.{{ virtual_domain.name }}
+{% endfor %}

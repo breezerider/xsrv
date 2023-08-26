@@ -74,26 +74,28 @@ dnsmasq_upstream_servers:
 ##### LIBVIRT - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/samba/defaults/libvirt.yml
 
 ##### MAILSERVER - https://gitlab.com/nodiscc/xsrv/-/blob/master/roles/mailserver/defaults/main.yml
-mailserver_fqdn: "{{ domain_name }}"
+mailserver_fqdn: "mail.{{ domain_name }}"
 mailserver_autoconfig_fqdn: "autoconfig.{{ domain_name }}"
+mailserver_local_mail_fqdn: "{{ domain_name }}"
 mailserver_https_mode: "letsencrypt"
+
 mailserver_letsencrypt_email: "{{ xsrv_admin_email }}"
 
 mailserver_virtual_domains:
-  - name: "{{ mailserver_fqdn }}"
+  - name: "{{ mailserver_local_mail_fqdn }}"
     pk_id: 1
 
 mailserver_virtual_aliases:
-  - source: "root@{{ mailserver_fqdn }}"
+  - source: "root@{{ mailserver_local_mail_fqdn }}"
     destination: "{{ mailserver_virtual_users[0].account }}"
     domain_pk_id: 1
-  - source: "postmaster@{{ mailserver_fqdn }}"
+  - source: "postmaster@{{ mailserver_local_mail_fqdn }}"
     destination: "{{ mailserver_virtual_users[0].account }}"
     domain_pk_id: 1
-  - source: "webmaster@{{ mailserver_fqdn }}"
+  - source: "webmaster@{{ mailserver_local_mail_fqdn }}"
     destination: "{{ mailserver_virtual_users[0].account }}"
     domain_pk_id: 1
-  - source: "abuse@{{ mailserver_fqdn }}"
+  - source: "abuse@{{ mailserver_local_mail_fqdn }}"
     destination: "{{ mailserver_virtual_users[0].account }}"
     domain_pk_id: 1
   - source: "{{ xsrv_admin_email }}"

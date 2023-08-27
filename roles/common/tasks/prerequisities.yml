@@ -39,3 +39,12 @@
     name: "en_US.UTF-8"
     state: present
   become: yes
+
+- name: install bash color prompt template
+  copy:
+    src: "bashrc-color-prompt"
+    dest: "/etc/skel/.bashrc-color-prompt"
+    owner: root
+    group: root
+    mode: "0655"
+  become: yes

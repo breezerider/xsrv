@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+# Custom bash prompt via kirsle.net/wizards/ps1.html
+case "$TERM" in
+    xterm|xterm-color|*-256color)
+        RED="\[$(tput setaf 1)\]"
+        GREEN="\[$(tput setaf 2)\]"
+        MAGENTA="\[$(tput setaf 5)\]"
+        CYAN="\[$(tput setaf 6)\]"
+        BOLD="\[$(tput bold)\]"
+        NORM="\[$(tput sgr0)\]"
+        if [[ ${EUID} == 0 ]] ; then
+            PS1="${BOLD}${RED}\D{%b %d %H:%M} \h${MAGENTA} \W \\\$ ${NORM}"
+        else
+            PS1="${BOLD}${GREEN}\D{%b %d %H:%M} \h${CYAN} \W \\\$ ${NORM}"
+        fi
+        unset RED GREEN MAGENTA CYAN BOLD NORM
+    ;;
+    *)
+        PS1="\D{%b %d %H:%M} \h \W \\\$ "
+    ;;
+esac

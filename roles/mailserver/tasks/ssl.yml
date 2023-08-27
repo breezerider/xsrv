@@ -1,4 +1,15 @@
-- name: Create strong Diffie-Hellman group (4096 bits)
-  command:
-    cmd: "openssl dhparam -out /etc/ssl/private/dhparam4096.pem 4096"
-    creates: /etc/ssl/private/dhparam4096.pem
+- name: copy systemd service file to generate dhparam file (4096 bit)
+  copy:
+    src: etc_systemd_system_generate-dhparam.service
+    dest: /etc/systemd/system/generate-dhparam.service
+    owner: root
+    group: root
+
+- name: start generate-dhparam service
+  service:
+    name: generate-dhparam
+    no_block: "true"
+    state: "started"
+    enabled: "yes"
+  tags: services
+  ignore_errors: "{{ ansible_check_mode }}"

@@ -1,0 +1,7 @@
+[Unit]
+Description=generate dhparam file (4096 bit)
+ConditionPathExists=!/etc/ssl/private/dhparam4096.pem
+
+[Service]
+Type=oneshot
+ExecStart=openssl dhparam -out /etc/ssl/private/dhparam4096.pem 4096

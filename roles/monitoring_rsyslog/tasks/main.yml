@@ -30,13 +30,13 @@
     - monitoring
     - rsyslog
 
-- name: import firewalld configuration tasks
-  import_tasks: firewalld.yml
+- name: import logrotate configuration tasks
+  import_tasks: logrotate.yml
   become: yes
   tags:
     - monitoring
-    - rsyslog
-    - firewall
+    - logrotate
+
   when:
     - ansible_local.firewalld.ansible_managed is defined
     - ansible_local.firewalld.ansible_managed | bool
@@ -46,6 +46,7 @@
   become: yes
   tags:
     - monitoring
+    - logrotate
     - rsyslog
 
 - name: apply configuration (flush handlers)

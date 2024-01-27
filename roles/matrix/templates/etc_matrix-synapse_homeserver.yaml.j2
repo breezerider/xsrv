@@ -8,7 +8,7 @@
 #
 # For more information on how to configure Synapse, including a complete accounting of
 # each option, go to docs/usage/configuration/config_documentation.md or
-# https://matrix-org.github.io/synapse/latest/usage/configuration/config_documentation.html
+# https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html
 #
 # This is set in /etc/matrix-synapse/conf.d/server_name.yaml for Debian installations.
 # server_name: "SERVERNAME"
@@ -19,6 +19,8 @@ listeners:
     type: http
     x_forwarded: true
     bind_addresses: ['127.0.0.1']
+    # uncomment this if IPv6 is in use
+    #bind_addresses: ['::1', '127.0.0.1']
     resources:
       - names: [client, federation]
         compress: false

@@ -1,4 +1,6 @@
 # rsnapshot configuration for synapse backups
 # backup synapse data directory
 backup	/var/lib/matrix-synapse/media/	localhost/
+# backup synapse configuration & signing keys
+backup	/etc/matrix-synapse/	localhost/
 # synapse database backups are managed by the postgresql role

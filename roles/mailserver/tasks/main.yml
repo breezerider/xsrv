@@ -29,7 +29,19 @@
     - mail
     - ssl
   when:
-    - mailserver_https_mode == 'letsencrypt'
+    - mailserver_https_mode == 'letsencrypt_service'
+
+- name: import autoconfig configuration tasks
+  import_tasks: autoconfig.yml
+  become: yes
+  tags:
+    - mail
+
+- name: import apache configuration tasks
+  import_tasks: apache.yml
+  become: yes
+  tags:
+    - mail
 
 - name: import SSL configuration tasks
   import_tasks: ssl.yml
@@ -83,18 +95,6 @@
   become: yes
   tags:
     - dovecot
-    - mail
-
-- name: import autoconfig configuration tasks
-  import_tasks: autoconfig.yml
-  become: yes
-  tags:
-    - mail
-
-- name: import apache configuration tasks
-  import_tasks: apache.yml
-  become: yes
-  tags:
     - mail
 
 - name: import fail2ban configuration tasks

@@ -14,9 +14,13 @@ ssl = {{ 'required' if dovecot_ssl_required else 'yes' }}
 ssl_cert = </etc/ssl/certs/{{ mailserver }}.crt
 ssl_key = </etc/ssl/private/{{ mailserver }}.key
 {% endif %}
-{% if mailserver_https_mode == 'letsencrypt' %}
+{% if mailserver_https_mode == 'letsencrypt_service' %}
 ssl_cert = </etc/letsencrypt/live/{{ mailserver_fqdn }}/fullchain.pem
 ssl_key = </etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem
+{% endif %}
+{% if mailserver_https_mode == 'letsencrypt_mod_md' %}
+ssl_cert = </etc/apache2/md/domains/{{ mailserver_autoconfig_fqdn }}/pubcert.pem
+ssl_key = </etc/apache2/md/domains/{{ mailserver_autoconfig_fqdn }}/privkey.pem
 {% endif %}
 
 # If key file is password protected, give the password here. Alternatively

@@ -56,9 +56,13 @@ smtpd_tls_protocols = >=TLSv1.2
 smtpd_tls_cert_file = /etc/ssl/certs/{{ mailserver }}.crt
 smtpd_tls_key_file = /etc/ssl/private/{{ mailserver }}.key
 {% endif %}
-{% if mailserver_https_mode == 'letsencrypt' %}
+{% if mailserver_https_mode == 'letsencrypt_service' %}
 smtpd_tls_cert_file = /etc/letsencrypt/live/{{ mailserver_fqdn }}/fullchain.pem
 smtpd_tls_key_file = /etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem
+{% endif %}
+{% if mailserver_https_mode == 'letsencrypt_mod_md' %}
+smtpd_tls_cert_file = /etc/apache2/md/domains/{{ mailserver_autoconfig_fqdn }}/pubcert.pem
+smtpd_tls_key_file = /etc/apache2/md/domains/{{ mailserver_autoconfig_fqdn }}/privkey.pem
 {% endif %}
 smtpd_use_tls = yes
 smtpd_tls_auth_only = yes

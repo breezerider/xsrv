@@ -1,21 +1,29 @@
 <VirtualHost *:80>
   ServerName {{ mailserver_autoconfig_fqdn }}
   ServerAlias {{ mailserver_fqdn }}
+  ServerAlias {{ postfix_fqdn }}
+  ServerAlias {{ dovecot_fqdn }}
 
   Redirect permanent / https://{{ mailserver_autoconfig_fqdn }}/
 </VirtualHost>
 
-{% if mailserver_https_mode == 'letsencrypt' %}
+{% if mailserver_https_mode == 'letsencrypt_mod_md' %}
 MDomain {{ mailserver_autoconfig_fqdn }}
 {% endif %}
 
 <VirtualHost *:443>
   ServerName {{ mailserver_autoconfig_fqdn }}
   ServerAlias {{ mailserver_fqdn }}
+  ServerAlias {{ postfix_fqdn }}
+  ServerAlias {{ dovecot_fqdn }}
   SSLEngine On
-{% if nextcloud_https_mode == 'selfsigned' %}
+{% if mailserver_https_mode == 'selfsigned' %}
   SSLCertificateFile /etc/ssl/certs/{{ mailserver_fqdn }}.crt
   SSLCertificateKeyFile /etc/ssl/private/{{ mailserver_fqdn }}.key
+{% endif %}
+{% if mailserver_https_mode == 'letsencrypt_service' %}
+  SSLCertificateFile /etc/letsencrypt/live/{{ mailserver_fqdn }}/fullchain.crt
+  SSLCertificateKeyFile /etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.key
 {% endif %}
 
   DocumentRoot            "/var/www/autoconfig"

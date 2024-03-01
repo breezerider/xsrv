@@ -51,7 +51,7 @@
 
 - name: request an SSL certificate for {{ mailserver_fqdn }}, {{ postfix_fqdn }} and {{ dovecot_fqdn }} from LetsEncrypt
   command:
-    cmd: "letsencrypt-gencert {{ mailserver_fqdn }} {{ postfix_fqdn }} {{ dovecot_fqdn }}"
+    cmd: "letsencrypt-gencert {{ mailserver_fqdn }} {{ postfix_fqdn }} {{ dovecot_fqdn }} {{ mailserver_autoconfig_fqdn }}"
     creates: "/etc/letsencrypt/live/{{ mailserver_fqdn }}/privkey.pem"
 
 - name: modify permissions to allow ssl-cert group access

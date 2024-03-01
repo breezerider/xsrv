@@ -76,4 +76,4 @@
     state: "{{ 'started' if dovecot_enable_service else 'stopped' }}"
     enabled: "{{ 'yes' if dovecot_enable_service else 'no' }}"
   tags: services
-  ignore_errors: "{{ ansible_check_mode }}"
+  ignore_errors: "{{ ansible_check_mode or (mailserver_https_mode == 'letsencrypt_mod_md') }}"

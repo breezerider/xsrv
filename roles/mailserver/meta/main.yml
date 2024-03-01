@@ -2,8 +2,8 @@
 
 galaxy_info:
   role_name: mailserver
-  author: "nodiscc <nodiscc@gmail.com>"
-  description: "IMAP mailbox server"
+  author: "Oleksandr Ostrenko <oleksandr@ostrenko.dev>"
+  description: "Email server using IMAP/SMTP protocols (supports SMTP relays)"
   license: GPL-3.0
   min_ansible_version: "2.12"
   platforms:

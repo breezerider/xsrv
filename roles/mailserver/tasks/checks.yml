@@ -9,6 +9,7 @@
       - mail_db_name is string
       - mail_db_password is not search("CHANGEME")
       - mail_db_user is string
+      - mailserver_https_mode in ["selfsigned", "letsencrypt_service", "letsencrypt_mod_md"]
       # dovecot
       - dovecot_fqdn is not search("CHANGEME")
       - dovecot_ldap_uri is not search("CHANGEME") or dovecot_auth_provider != "ldap"

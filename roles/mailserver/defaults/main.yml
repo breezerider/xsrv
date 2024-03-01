@@ -12,6 +12,11 @@ mailserver_autoconfig_fqdn: "autoconfig.CHANGEME.org"
 mailserver_letsencrypt_server: "https://acme-v02.api.letsencrypt.org/directory"
 # e-mail address to register a letsencrypt.org account
 mailserver_letsencrypt_email: "CHANGEME"
+# HTTPS and SSL/TLS certificate mode for the mailserver components
+#   letsencrypt_service: acquire a certificate from letsencrypt.org using cerbot
+#   letsencrypt_mod_md: acquire a certificate from letsencrypt.org via Apache web server's mod_md
+#   selfsigned: generate a self-signed certificate
+mailserver_https_mode: 'selfsigned'
 # list of virtual domains
 mailserver_virtual_domains: []
 # list of virtual users

@@ -6,6 +6,7 @@
     - element
     - checks
     - synapse-admin
+    - eturnal
 
 - name: import postgresql configuration tasks
   import_tasks: postgresql.yml
@@ -34,6 +35,15 @@
   tags:
     - matrix
     - synapse-admin
+
+- name: import eturnal setup tasks
+  import_tasks: eturnal.yml
+  become: yes
+  tags:
+    - matrix
+    - eturnal
+  when:
+    - matrix_eturnal_server | bool
 
 # - name: import fail2ban configuration tasks
 #   import_tasks: fail2ban.yml

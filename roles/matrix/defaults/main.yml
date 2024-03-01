@@ -30,6 +30,14 @@ matrix_firewalld_zones:
   - zone: public
     state: disabled
 
+##### TURN SERVER #####
+# enable/disable TURN server (yes/no)
+matrix_eturnal_server: no
+# random secret for the TURN server
+matrix_eturnal_shared_secret: "CHANGEME25"
+# start/stop the eturnal service, enable/disable it on boot (yes/no)
+matrix_eturnal_enable_service: yes
+
 ##### LDAP AUTHENTICATION #####
 # enable/disable LDAP authentication (yes/no)
 matrix_synapse_ldap: no

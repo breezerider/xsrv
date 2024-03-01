@@ -1,0 +1,4 @@
+turn_uris: [ "turn:{{ matrix_synapse_fqdn }}?transport=udp", "turn:{{ matrix_synapse_fqdn }}?transport=tcp" ]
+turn_shared_secret: "{{ matrix_eturnal_shared_secret }}"
+turn_user_lifetime: 86400000
+turn_allow_guests: false

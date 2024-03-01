@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service>
+  <short>modern, straightforward STUN and TURN server</short>
+  <port port="49152-65535" protocol="udp"/>
+  <port port="3478" protocol="tcp"/>
+  <port port="3478" protocol="udp"/>
+</service>

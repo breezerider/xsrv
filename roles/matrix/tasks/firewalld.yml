@@ -1,3 +1,21 @@
+- name: copy eturnal firewalld service definition
+  copy:
+    src: etc_firewalld_services_eturnal.xml
+    dest: /etc/firewalld/services/eturnal.xml
+    owner: root
+    group: adm
+    mode: "0640"
+  notify: reload firewalld
+  when:
+    - matrix_eturnal_server | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+
+# reload firewalld service definitions
+- name: apply configuration (flush handlers)
+  meta: flush_handlers
+  when:
+    - matrix_eturnal_server | bool
+
 - name: setup firewalld rules for synapse
   ansible.posix.firewalld:
     zone: "{{ item.zone }}"
@@ -6,3 +24,14 @@
     permanent: yes
     immediate: yes
   with_items: "{{ matrix_firewalld_zones }}"
+
+- name: setup firewalld rules for eturnal
+  ansible.posix.firewalld:
+    zone: "{{ item.zone }}"
+    service: eturnal
+    state: "{{ item.state }}"
+    permanent: yes
+    immediate: yes
+  with_items: "{{ matrix_firewalld_zones }}"
+  when:
+    - matrix_eturnal_server | bool

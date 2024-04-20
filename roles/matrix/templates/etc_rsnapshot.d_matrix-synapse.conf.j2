@@ -3,4 +3,8 @@
 backup	/var/lib/matrix-synapse/media/	localhost/
 # backup synapse configuration & signing keys
 backup	/etc/matrix-synapse/	localhost/
+{% if matrix_eturnal_server %}
+# backup eturnal configuration
+backup	/etc/eturnal.yaml	localhost/
+{% endif %}
 # synapse database backups are managed by the postgresql role

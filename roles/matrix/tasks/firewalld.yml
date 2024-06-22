@@ -32,6 +32,6 @@
     state: "{{ item.state }}"
     permanent: yes
     immediate: yes
-  with_items: "{{ matrix_firewalld_zones }}"
+  with_items: "{{ matrix_eturnal_firewalld_zones }}"
   when:
     - matrix_eturnal_server | bool

@@ -1,3 +1,7 @@
 # rsnapshot configuration for dovecot backups
 # backup dovecot data/mail directory
 backup			/var/mail/vhosts/	localhost/
+# backup dovecot configuration directory
+backup			/etc/dovecot/	localhost/
+# backup sieve filters directory
+backup			/var/lib/dovecot/sieve/	localhost/

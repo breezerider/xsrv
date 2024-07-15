@@ -21,18 +21,32 @@
     group: root
     mode: "0600"
 
+- name: get and display default group of the ansible user
+  block:
+    - name: get default group of the ansible user
+      command:
+        cmd: id -gn {{ ansible_user }}
+      register: ansible_user_default_group
+      changed_when: no
+      check_mode: no # run even in check mode so that following tasks don't fail, doesn't change anything
+    - name: display default group of the ansible user
+      debug:
+        msg: "{{ ansible_user_default_group.stdout }}"
+
 - name: set permissions/mode of ansible user and root home directories to 0700
   file:
     state: directory
     path: "{{ item.path }}"
     owner: "{{ item.owner }}"
-    group: "{{ item.owner }}"
+    group: "{{ item.group }}"
     mode: "0700"
   with_items:
     - path: "{{ ansible_env.HOME }}"
       owner: "{{ ansible_user }}"
+      group: "{{ ansible_user_default_group.stdout }}"
     - path: /root
       owner: root
+      group: root
 
 - name: create additional user accounts
   user:

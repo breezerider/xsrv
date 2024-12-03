@@ -36,8 +36,8 @@
   ignore_errors: "{{ ansible_check_mode }}"
   notify: restart synapse
   with_items:
-    - src: etc_eturnal.yaml.j2
-      dest: /etc/eturnal.yaml
+    - src: etc_eturnal.yml.j2
+      dest: /etc/eturnal.yml
     - src: etc_matrix-synapse_conf.d_eturnal.yaml.j2
       dest: /etc/matrix-synapse/conf.d/eturnal.yaml
 

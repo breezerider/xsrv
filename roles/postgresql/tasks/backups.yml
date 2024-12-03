@@ -23,3 +23,9 @@
   when:
     - ansible_local.backup.ansible_managed is defined
     - ansible_local.backup.ansible_managed | bool
+
+- name: copy script for restoring from pg_dump backups to rsnapshot directory
+  template:
+    src: usr_local_bin_postgres-restore-all-databases.sh.j2
+    dest: /usr/local/bin/postgres-restore-all-databases.sh
+    mode: "0755"

@@ -1,0 +1,24 @@
+#!/bin/bash
+# Description: dump all postgres databases to separate files + dump global variables
+set -o errexit
+set -o nounset
+
+if [ ! -d "$1" ]; then
+    echo "Path to postgres databases backup is required"
+    exit 1
+fi
+
+find "$1" -name '*.sql' -type f -print0 |
+    while IFS= read -r -d '' filepath; do
+        filename=$(basename "$filepath")
+        if [[ "$filename" == "postgres-globals.sql" ]]; then
+            echo "[INFO] Restoring Postgre globals from $filepath .. "
+            echo sudo -u postgres /usr/bin/psql --file "$filepath"
+            echo "[INFO] Finished restoring Postgre globals"
+        else
+            db=${filename%%*.sql}
+            echo "[INFO] Restore database $db from $filepath ..."
+            echo sudo -u postgres /usr/bin/pg_restore --dbname "$db" --clean --if-exists "$filepath"
+            echo "[INFO] Finished restoring database $db"
+        fi
+    done

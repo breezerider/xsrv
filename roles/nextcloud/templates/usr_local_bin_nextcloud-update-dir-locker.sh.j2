@@ -1,0 +1,17 @@
+#!/bin/bash
+
+NEXTCLOUD_DIR={{ nextcloud_install_dir }}
+
+case "$1" in
+  unlock)
+    chown -R nextcloud "$NEXTCLOUD_DIR"
+    ;;
+  lock)
+    chown -R root:root "$NEXTCLOUD_DIR"
+    chown -R nextcloud:nextcloud "$NEXTCLOUD_DIR"/{apps,config,themes}
+    chown nextcloud:nextcloud "$NEXTCLOUD_DIR"/{.user.ini,occ}
+    ;;
+  *)
+    echo "unknown verb: $1"
+    exit 1
+esac

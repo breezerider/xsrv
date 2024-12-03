@@ -333,6 +333,12 @@
   changed_when: "'will be updated' in nextcloud_convert_filecache_bigint.stdout"
   ignore_errors: "{{ ansible_check_mode }}"
 
+- name: copy script for manging directory permissing during nextcloud updates
+  template:
+    src: usr_local_bin_nextcloud-update-dir-locker.sh.j2
+    dest: /usr/local/bin/nextcloud-update-dir-locker.sh
+    mode: "0755"
+
 ### ANSIBLE FACTS ###
 
 - name: create ansible facts.d directory

@@ -4,3 +4,24 @@
     dest: /etc/rsnapshot.d/dovecot.conf
     mode: "0600"
   notify: check rsnapshot configuration
+
+- name: copy rsnapshot configuration for postgrey backups
+  template:
+    src: etc_rsnapshot.d_postgrey.conf.j2
+    dest: /etc/rsnapshot.d/postgrey.conf
+    mode: "0600"
+  notify: check rsnapshot configuration
+
+- name: copy rsnapshot configuration for postfix backups
+  template:
+    src: etc_rsnapshot.d_postfix.conf.j2
+    dest: /etc/rsnapshot.d/postfix.conf
+    mode: "0600"
+  notify: check rsnapshot configuration
+
+- name: copy rsnapshot configuration for opendkim backups
+  template:
+    src: etc_rsnapshot.d_opendkim.conf.j2
+    dest: /etc/rsnapshot.d/opendkim.conf
+    mode: "0600"
+  notify: check rsnapshot configuration
